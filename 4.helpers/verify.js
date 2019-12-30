@@ -1,12 +1,13 @@
 const jwt = require('jsonwebtoken')
-const User = require('../3.models/users')
+// const User = require('../3.models/employee')
 require('dotenv').config()
 
-module.exports = async (req, res, next) => {
-    if (req.headers.authorization) {
-        const decoded = jwt.verify(req.headers.authorization, process.env.KEY)
-        const validation = await User.findOne({ where: { email: decoded } })
-        if (validation) return next()
+module.exports = (req, res, next) => {
+
+    const { authorization } = req.headers
+    if (authorization) {
+        const decoded = jwt.verify(authorization, process.env.KEY)
+        if (decoded.jobTitle === 'President') return next()
     }
-    res.status(401).send(null)
+    res.status(401).send('Access Denied!')
 }

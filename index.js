@@ -2,12 +2,10 @@ const express = require('express');
 
 const app = express();
 
-// const trainRouters = require('./2.routers/trainRouters');
-const userRouters = require('./2.routers/userRouters')
+const employees = require('./2.routers/employeesRouters')
 
 app.use(express.json());
 
-// app.use('/', trainRouters)
-app.use('/', userRouters)
+app.use('/', employees)
 
 app.listen(8000, () => console.log('listening to port 8000'));

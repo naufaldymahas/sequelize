@@ -1,17 +1,17 @@
 const { DataTypes } = require('sequelize')
 const db = require('../database')
 
-module.exports = db.define('users', {
-    id: {
+module.exports = db.define('employees', {
+    employeeNumber: {
         type: DataTypes.INTEGER,
         autoIncrement: true,
         primaryKey: true
     },
-    full_name: DataTypes.STRING,
+    lastName: DataTypes.STRING,
+    firstName: DataTypes.STRING,
     email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    is_verified: DataTypes.INTEGER,
-    created_at: DataTypes.DATE
+    reportsTo: DataTypes.INTEGER,
+    jobTitle: DataTypes.DATE
 }, {
     timestamps: false
 })

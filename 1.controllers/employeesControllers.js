@@ -1,4 +1,4 @@
-const Employee = require('../3.models/employee')
+const { Employee } = require('../3.models')
 const moment = require('moment')
 const { Op } = require('sequelize')
 // const crypto = require('crypto')
@@ -44,7 +44,6 @@ module.exports = {
             if (!data) return res.status(401).send('Wrong email!')
             const token = jwt.sign(data.dataValues, process.env.KEY)
             res.send(token)
-            console.log(token)
         } catch (error) {
             res.status(400).send(error)
             console.log(error)
@@ -53,15 +52,56 @@ module.exports = {
 
     getReportsTo: async (req, res) => {
         try {
-            const employeeNumber = req.params.id
-            const data = await Employee.findAll({
-                where : {
-                    [Op.or]: [
-                        { employeeNumber },
-                        { reportsTo: employeeNumber }
-                    ]
-                }
+            const employeeNumber = parseInt(req.params.id)
+            // const data = await Employee.findAll({
+            //     where : {
+            //         [Op.or]: [
+            //             { employeeNumber },
+            //             { reportsTo: employeeNumber }
+            //         ]
+            //     }
+            // })
+            Employee.hasMany(Employee, { as: 'needReportsTo', foreignKey: 'reportsTo' })
+            // Employee.belongsTo(Employee, { foreignKey: 'reportsTo' })
+            const data = await Employee.findByPk(employeeNumber, {
+                attributes: ['employeeNumber', 'lastName', 'firstName'],
+                include: [{
+                    model: Employee,
+                    as: 'needReportsTo'
+                }]
             })
+            if (data.length !== 0) {
+                res.send(data)
+            } else {
+                res.sendStatus(404)
+            }
+        } catch (error) {
+            console.log(error)
+        }
+    },
+    
+    getOffices: async (req, res) => {
+        const { id } = req.params
+        try {
+            Office.hasMany(Employee, { foreignKey: 'officeCode' })
+            Employee.belongsTo(Office, { foreignKey: 'officeCode' })
+            const data = await Office.findByPk(id, {
+                include: [Employee]
+            })
+            res.send(data)
+        } catch (error) {
+            console.log(error)
+        }
+    },
+
+    paginatedEmployee: async (req, res) => {
+        const limit = parseInt(req.query.limit)
+        let page = parseInt(req.query.page)
+        if (page == 1) {
+            page = 0
+        }
+        try {
+            const data = await Employee.findAll({ limit, offset: page })
             res.send(data)
         } catch (error) {
             console.log(error)

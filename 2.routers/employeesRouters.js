@@ -11,4 +11,8 @@ Router.post('/employee', employee.add)
 
 Router.post('/employee/login', employee.login)
 
+Router.get('/employee/office/:id', employee.getOffices)
+
+Router.get('/employees', employee.paginatedEmployee)
+
 module.exports = Router
